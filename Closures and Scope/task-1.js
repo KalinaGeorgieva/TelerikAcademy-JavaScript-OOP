@@ -88,26 +88,27 @@ function solve() {
         }
 
         function checksBookParams(book) {
-            if (!book) {
-                throw new Error('book');
+
+            if (typeof book === 'undefined') {
+                throw new Error('no book added');
             }
             if (book.title.length < 2 || book.title.length > 100) {
-                throw new Error('title');
+                throw new Error('title name must be between 2 and 100 characters');
             }
-            if (!book.category) {
+            if (typeof book.category === 'undefined') {
                 book.category = "Book category";
             }
             if (book.category.length < 2 || book.category.length > 100) {
-                throw new Error('categories');
+                throw new Error('categories name must be between 2 and 100 characters');
             }
             if (book.author === '') {
-                throw new Error('author');
+                throw new Error('author name can not be an empty string');
             }
             if (book.isbn.length !== 10 && book.isbn.length !== 13) {
-                throw new Error('isbn');
+                throw new Error('isbn must contains either 10 or 13 digits');
             }
             if (!isUnique(book.title, book.isbn)) {
-                throw new Error('unique');
+                throw new Error('book title and book isbn must be unique');
             }
         }
 
