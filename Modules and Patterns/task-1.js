@@ -46,7 +46,6 @@
 
 function solve() {
     let lastId = 0;
-    let studentsIDs = [];
 
     function isUpperCaseLetter(letter) {
         return letter >= 'A' && letter <= 'Z';
@@ -130,20 +129,22 @@ function solve() {
             this._presentations = presentations;
             this._students = [];
 
-
             return this;
-
         },
         addStudent: function(name) {
             if (typeof name !== 'string') {
                 throw 'addStudent: typeof name !== string';
             }
+
             let splitName = name.split(' ');
+
             if (splitName.length !== 2) {
                 throw 'addStudent: splitName.length !== 2';
             }
+
             let firstName = splitName[0];
             let lastName = splitName[1];
+
             if (!isUpperCaseLetter(firstName[0]) || !isUpperCaseLetter(lastName[0])) {
                 throw 'addStudent: Names start with an upper case letter';
             }
@@ -157,6 +158,7 @@ function solve() {
                     throw 'addStudent: All other symbols in the name (if any) are lowercase letters';
                 }
             }
+            
             let id = lastId += 1;
 
             this._students.push({ firstName: firstName, lastName: lastName, id: id, score: 0 });
