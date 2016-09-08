@@ -55,29 +55,23 @@ function solve() {
                 throw `${msg} must be between ${min} and ${max}`;
             }
         },
-        isItem: function(value) {
-            let isItem = Object.keys(Item)
-                .every(function(key) {
-                    return (typeof value[key] !== 'undefined');
-                });
-
-            return isItem;
+        isItemLikeObject: function(value) {
+            return (value instanceof Item) ||
+                (typeof value.id === "number" &&
+                    typeof value.name === "string" &&
+                    typeof value.description === "string");
         },
-        isBook: function(value) {
-            let isBook = this.isItem(value) && Object.keys(Book)
-                .every(function(key) {
-                    return (typeof value[key] !== 'undefined');
-                });
-
-            return isBook;
+        isBookLikeObject: function(value) {
+            return this.isItemLikeObject(value) &&
+                ((value instanceof Book) ||
+                    (typeof value.isbn === "string" &&
+                        typeof value.genre === "string"));
         },
-        isMedia: function(value) {
-            let isMedia = this.isItem(value) && Object.keys(Media)
-                .every(function(key) {
-                    return (typeof value[key] !== 'undefined');
-                });
-
-            return isMedia;
+        isMediaLikeObject: function(value) {
+            return this.isItemLikeObject(value) &&
+                ((value instanceof Media) ||
+                    (typeof value.rating === "number" &&
+                        typeof value.duration === "number"));
         },
         arrayToReturn: function(arr) {
             if (Array.isArray(arr[0])) {
@@ -230,6 +224,12 @@ function solve() {
                 validator.isEmpty(itemsArray);
 
                 for (let item of itemsArray) {
+                    if (!validator.isItemLikeObject(item)) {
+                        throw 'item is not item instance or item-like object';
+                    }
+                }
+
+                for (let item of itemsArray) {
                     this.items.push(item);
                 }
                 return this;
@@ -246,11 +246,13 @@ function solve() {
                     return null;
                 }
                 if (options !== null && typeof options === 'object') {
-                    return this.items.filter(function(item) {
-                        return Object.keys(options).every(function(prop) {
-                            return options[prop] === item[prop];
+                    return this.items
+                        .filter(function(item) {
+                            return Object.keys(options)
+                                .every(function(prop) {
+                                    return options[prop] === item[prop];
+                                });
                         });
-                    });
                 }
                 throw 'options must be number or object';
 
@@ -294,7 +296,7 @@ function solve() {
                 validator.isEmpty(booksArray);
 
                 for (let book of booksArray) {
-                    if (!(book instanceof Book)) {
+                    if (!validator.isBookLikeObject(book)) {
                         throw 'items is not an Book instance or not an Book-like object';
                     }
                 }
@@ -334,7 +336,7 @@ function solve() {
                 validator.isEmpty(mediaArray);
 
                 for (let media of mediaArray) {
-                    if (!(media instanceof Media)) {
+                    if (!validator.isMediaLikeObject(media)) {
                         throw 'items is not an Media instance or not an Media-like object';
                     }
                 }
@@ -348,15 +350,18 @@ function solve() {
                 if (count < 1) {
                     throw 'MediaCatalog getTop count must be more than 1';
                 }
-                let sortedItems = this.items.sort(function(a, b) {
-                    return a.rating < b.rating;
+                this.items = this.items.sort(function(a, b) {
+                    return a.rating - b.rating;
                 });
+                if (count > this.items.length) {
+                    count = this.items.length;
+                }
 
                 let arrayToReturn = [];
                 for (let i = 0; i < count; i += 1) {
                     arrayToReturn.push({
-                        id: sortedItems[i].id,
-                        name: sortedItems[i].name,
+                        id: this.items[i].id,
+                        name: this.items[i].name,
                     });
                 }
                 return arrayToReturn;
@@ -392,6 +397,10 @@ function solve() {
         }
     };
 }
-
+let result = solve();
+let media = result.getMedia('generic', 1, 2, 'mediaDes');
+let mediaCatalog = result.getMediaCatalog('mediaCatalogName');
+mediaCatalog.add(media);
+console.log(mediaCatalog.getTop(20));
 
 module.exports = solve;
