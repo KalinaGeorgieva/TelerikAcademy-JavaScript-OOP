@@ -261,13 +261,13 @@ function solve() {
                 validator.isString(pattern, 'catalog pattern');
                 validator.isEmpty(pattern, 'catalog pattern');
 
-                pattern = pattern.toLowerCase();
+
                 let itemstToReturn = [];
                 let itemsArr = this.items;
 
                 for (let item of itemsArr) {
-                    let isPatternFoundInName = item.name.toLowerCase().indexOf(pattern) >= 0;
-                    let isPatternFoundInDescription = item.description.toLowerCase().indexOf(pattern) >= 0;
+                    let isPatternFoundInName = item.name.indexOf(pattern) >= 0;
+                    let isPatternFoundInDescription = item.description.indexOf(pattern) >= 0;
 
                     if (isPatternFoundInName || isPatternFoundInDescription) {
                         itemstToReturn.push(item);
